@@ -1,0 +1,44 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{subfigure}
+
+\title{Sistema de Cinema}
+\author{
+Felipe Luís Pinheiro - 18/0052667 \and 
+João Pedro C.N. Mota - 17/0106144 \and 
+Pedro Catelli - 17/0112624 \and
+Pedro Oliveira - 17/0163768}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Neste relatório desenvolvemos os requisitos básicos de um sistema de banco de dados para um modelo de vendas de ingresso de um cinema. 
+\end{abstract}
+
+\section{Projeto Cinema}
+
+Requisitos gerais:
+
+\begin{itemize}
+	\item Um cinema pode ter muitas salas, sendo necessário, por tanto, registrar informações a respeito de cada uma, como sua capacidade, ou seja, o numero de assentos disponíveis.
+	\item O cinema apresenta muitos filmes. Um filme tem informações, titulo e duração. Assim, sempre que um filme for ser apresentado, deve-se registrá-lo também.
+	\item Um mesmo filme pode ser apresentado em diferentes salas e em horários diferentes. Cada apresentação em uma determinada sala e horário é chamada sessão. Um filme sendo apresentado em uma sessão tem um conjunto máximo de ingressos, determinado pela capacidade da sala.
+	\item Os clientes do cinema podem comprar ou não ingressos para assistir a uma sessão. O
+funcionário deve intermediar a compra do ingresso. Um ingresso deve conter informação
+como o tipo de ingresso (Meio ingresso ou ingresso inteiro). Além disso, um cliente só pode
+comprar ingressos para sessões ainda não encerradas.
+\end{itemize}
+
+
+%\pagebreak
+%\bibliographystyle{plain}
+%\bibliography{MyLib} 
+\end{document} 
