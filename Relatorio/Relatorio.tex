@@ -27,7 +27,7 @@
 				deletekeywords={[2]INT},
 				morekeywords={clustered},
 				framesep=8pt,
-				%xleftmargin=40pt,
+				xleftmargin=40pt,
 				%framexleftmargin=40pt,
 				frame=tb,
 				framerule=0pt,
@@ -118,6 +118,41 @@ Nesta seção mostramos exemplo de consultas que podem ser realizadas nesse mode
 		
 		select * from people, addresses,phones where people.id = addresses.PersonId and people.id = phones.PersonId and addresses.Discriminator = 'AddressPerson';
 \end{lstlisting}
+
+
+\section{Views}
+
+Nesta parte mostramos exemplos da utilização de Views no código do SQL.
+
+\begin{lstlisting}
+	use unbcineflix;
+
+	drop view addresscompany;
+
+	drop view AddressPerson;
+
+	drop view SoldTickets;
+
+	create view AddressCompany as SELECT Country,state, city, Street, number, zipcode, name from addresses WHERE addresses.Discriminator = 'AddressCompany';
+
+	create view AddressPerson as SELECT Country,state, city, Street, number, zipcode from addresses WHERE addresses.Discriminator = 'AddressPerson';
+
+	create view SoldTickets as select session.id as 'numero sessao', movies.Title as 'Titulo do filme', session.MovieTheaterNumber as 'sala', session.SessionTime as 'dia e hora', ChairCol as 'numero coluna', ChairRow  as 'numero fileira', Value as 'valor' from session, movietheaters, tickets, movies where session.Id = tickets.SessionId and session.AddressCompanyId = movietheaters.AddressCompanyId and movietheaters.MovieTheaterNumber = session.MovieTheaterNumber and session.MovieId = movies.id;
+
+	select * from addresscompany;
+
+	select * from AddressPerson;
+
+	select * from SoldTickets;
+\end{lstlisting}
+
+Na figura \ref{fig:view_soldticket} podemos ver um exemplo de resultado mostrado pela viu SoldTickets.
+
+\begin{figure}%
+\includegraphics[width=\columnwidth]{View_exemplo}%
+\caption{Exemplo de resultado da View SoldTickets}%
+\label{fig:view_soldticket}%
+\end{figure}
 
 \section{Script Sql}
 
