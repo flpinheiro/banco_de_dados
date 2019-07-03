@@ -1,0 +1,8 @@
+\frametitle{Exemplo}
+\begin{lstlisting}
+
+	connection.Close();
+	File.Delete("StreamingSample.db");
+}
+	
+\end{lstlisting}

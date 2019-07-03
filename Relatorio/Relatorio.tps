@@ -12,13 +12,13 @@ MaxPos.y=-1
 NormalPos.left=4
 NormalPos.top=32
 NormalPos.right=1916
-NormalPos.bottom=632
+NormalPos.bottom=819
 Class=LaTeXView
 Document=Relatorio.tex
 
 [Frame0_View0,0]
-TopLine=24
-Cursor=1851
+TopLine=27
+Cursor=2191
 
 [SessionInfo]
 FrameCount=1
