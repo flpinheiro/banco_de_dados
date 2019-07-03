@@ -47,6 +47,36 @@
         showstringspaces=false,
         showtabs=false,      
     }
+    \lstdefinestyle{cstyle}{
+				language=c++,
+				basicstyle=\ttfamily,
+				keywordstyle=\color{blue}\ttfamily,
+				stringstyle=\color{red}\ttfamily,
+				commentstyle=\color{green}\ttfamily,
+				morecomment=[l][\color{magenta}]{\#},
+				tabsize=1,
+				framesep=4pt,
+				xleftmargin=20pt,
+				%framexleftmargin=40pt,
+				frame=tb,
+				framerule=0pt,
+        backgroundcolor=\color{backcolour},   
+        %commentstyle=\color{codegreen},
+        %keywordstyle=\color{codepurple},
+        numberstyle=\footnotesize\color{codegray},
+        %stringstyle=\color{codepurple},
+        basicstyle=\footnotesize,
+        breakatwhitespace=false,         
+        breaklines=true,                 
+        captionpos=b,                    
+        keepspaces=true,                 
+        numbers=none,                    
+        numbersep=-10pt,                  
+        showspaces=false,                
+        showstringspaces=false,
+        showtabs=false,      
+    }		
+		
     \lstset{style=mystyle} 
 
 \title{Sistema de Cinema}
@@ -64,7 +94,9 @@ Pedro Oliveira - 17/0163768}
 \begin{abstract}
 Neste relatório desenvolvemos os requisitos básicos de um sistema de banco de dados para um modelo de vendas de ingresso de um cinema. 
 
-Link para o repositório: \url{https://github.com/flpinheiro/banco_de_dados}. 
+Link para o repositório: \url{https://github.com/flpinheiro/banco_de_dados}.
+
+O projeto do programa que usa esse sistema de banco de dados está no repositorio : \url{https://github.com/flpinheiro/UnBCineFlixMVC}
 \end{abstract}
 
 \section{Introdução}
@@ -450,6 +482,255 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 		SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 		SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 \end{lstlisting}
+
+
+\section{Camada de Persistência}
+
+Para acesso ao banco de Dados foi utilizado o Entity FrameWork Core versão 2.2.4 e o sistema MySQL como banco de dados de persistência, a seguir mostramos o código de persistência da aplicação e exemplos do controlador de acesso. 
+
+O código a seguir é o código de ``Context'' do EntityFramework Core o qual foi desenvolvido seguindo os padrão do nomeclatura e de desenvolvimento exigidos pela comunidade, utilizamos esse FrameWork devido a sua camada de middleware que faz a conversão automática do sistema relacional para a orientação objeto utilizado no programa que foi desenvolvido com C\# e ASP.NET Core 2.2 tendo como objetivo final uma aplicação Web que poudesse ser executada por um usuario domestico ou pelos adiministradores do sistema diretamente da empresa, sendo assim uma aplicação completa para uma empresa. 
+
+\lstset{style=cstyle} 
+
+\begin{lstlisting}
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using UnBCineFlix.Models;
+
+namespace UnBCineFlix.DAL
+{
+		public class UnBCineFlixContext : DbContext
+		{
+				public DbSet<Address> Addresses { get; set; }
+				public DbSet<AddressCompany> AddressCompanies { get; set; }
+				public DbSet<AddressPerson> AddressPeople { get; set; }
+				public DbSet<Artist> Artists { get; set; }
+				public DbSet<ArtistMovie> ArtistMovies { get; set; }
+				public DbSet<Chair> Chairs { get; set; }
+				public DbSet<Company> Companies { get; set; }
+				public DbSet<Customer> Customers { get; set; }
+				public DbSet<Employee> Employees { get; set; }
+				//errorviemodel
+				public DbSet<Genre> Genres { get; set; }
+				public DbSet<GenreMovie> GenreMovies { get; set; }
+				public DbSet<Movie> Movies { get; set; }
+				public DbSet<MovieTheater> MovieTheaters { get; set; }
+				public DbSet<Person> People { get; set; }
+				public DbSet<Phone> Phones { get; set; }
+				public DbSet<Rating> Ratings { get; set; }
+				public DbSet<Session> Session { get; set; }
+				public DbSet<Ticket> Tickets { get; set; }
+
+				public UnBCineFlixContext()
+				{
+				}
+				public UnBCineFlixContext(DbContextOptions<UnBCineFlixContext> option)
+		: base(option)
+				{
+				}
+				protected override void OnModelCreating(ModelBuilder modelBuilder)
+				{
+						//Primary Key setup space
+						#region pk
+						modelBuilder.Entity<Address>().HasKey(a => a.Id);
+						modelBuilder.Entity<Person>().HasKey(p => p.Id);
+						modelBuilder.Entity<Phone>().HasKey(ph => ph.Id);
+						modelBuilder.Entity<Rating>().HasKey(r => r.Id);
+						modelBuilder.Entity<Artist>().HasKey(ar => ar.Id);
+						modelBuilder.Entity<Movie>().HasKey(m => m.Id);
+						modelBuilder.Entity<Company>().HasKey(c => c.Id);
+						modelBuilder.Entity<Session>().HasKey(s => s.Id);
+						modelBuilder.Entity<ArtistMovie>().HasKey(am => new { am.MovieId, am.ArtistId });
+						modelBuilder.Entity<GenreMovie>().HasKey(gm => new { gm.GenreId, gm.MovieId });
+						modelBuilder.Entity<MovieTheater>().HasKey(mt => new { mt.AddressCompanyId, mt.MovieTheaterNumber });
+						modelBuilder.Entity<Chair>().HasKey(ch => new { ch.AddressCompanyId, ch.MovieTheaterNumber, ch.Row, ch.Col });
+						modelBuilder.Entity<Ticket>().HasKey(t => new { t.SessionId, t.ChairRow, t.ChairCol });
+						#endregion
+
+						//foreign key setup space
+						#region fk
+						modelBuilder.Entity<AddressPerson>().HasOne(a => a.Person).WithMany(p => p.Addresses).HasForeignKey(a => a.PersonId).OnDelete(DeleteBehavior.Cascade);
+						modelBuilder.Entity<Phone>().HasOne(ph => ph.Person).WithMany(p => p.Phones).HasForeignKey(p => p.PersonId).OnDelete(DeleteBehavior.Cascade);
+
+						modelBuilder.Entity<AddressCompany>().HasOne(a => a.Company).WithMany(c => c.Addresses).HasForeignKey(ac => ac.CompanyId).OnDelete(DeleteBehavior.Cascade);
+						modelBuilder.Entity<Phone>().HasOne(ph => ph.AddressCompany).WithMany(c => c.Phones).HasForeignKey(p => p.AddressCompanyId).OnDelete(DeleteBehavior.Cascade);
+
+						modelBuilder.Entity<ArtistMovie>().HasOne(am => am.Artist).WithMany(a => a.Movies).HasForeignKey(am => am.ArtistId).OnDelete(DeleteBehavior.Cascade);
+						modelBuilder.Entity<ArtistMovie>().HasOne(am => am.Movie).WithMany(m => m.Artists).HasForeignKey(am => am.MovieId).OnDelete(DeleteBehavior.Cascade);
+
+						modelBuilder.Entity<GenreMovie>().HasOne(gm => gm.Genre).WithMany(g => g.GenreMovies).HasForeignKey(gm => gm.GenreId).IsRequired();
+						modelBuilder.Entity<GenreMovie>().HasOne(gm => gm.Movie).WithMany(m => m.GenreMovies).HasForeignKey(gm => gm.MovieId).IsRequired();
+
+						modelBuilder.Entity<Movie>().HasOne(m => m.Rating).WithMany(r => r.Movies).HasForeignKey(m => m.RatingId).OnDelete(DeleteBehavior.SetNull);
+
+						modelBuilder.Entity<MovieTheater>().HasOne(mt => mt.AddressCompany).WithMany(ac => ac.MovieTheaters).HasForeignKey(mt => mt.AddressCompanyId);
+
+						modelBuilder.Entity<Chair>().HasOne(ch => ch.MovieTheater).WithMany(mt => mt.Chairs).HasForeignKey(ch => new { ch.AddressCompanyId, ch.MovieTheaterNumber }).IsRequired().OnDelete(DeleteBehavior.Cascade);
+
+						modelBuilder.Entity<Session>().HasOne(s => s.MovieTheater).WithMany(mt => mt.Sessions).HasForeignKey(s => new { s.AddressCompanyId, s.MovieTheaterNumber });
+						modelBuilder.Entity<Session>().HasOne(s => s.Movie).WithMany(m => m.Sessions).HasForeignKey(s => s.MovieId);
+
+						modelBuilder.Entity<Ticket>().HasOne(t => t.Session).WithMany(s => s.Tickets).HasForeignKey(t=> t.SessionId).IsRequired();
+						#endregion
+
+						//Espaco para propriedades
+						#region properties
+						modelBuilder.Entity<MovieTheater>().Property<int>("QtdRow").IsRequired();
+						modelBuilder.Entity<MovieTheater>().Property<int>("QtdCol").IsRequired();
+						#endregion
+
+						//Heranca
+						#region heritage
+						modelBuilder.Entity<Customer>().HasBaseType<Person>();
+						modelBuilder.Entity<Employee>().HasBaseType<Person>();
+
+						modelBuilder.Entity<AddressCompany>(ac => { ac.HasBaseType<Address>(); });
+						modelBuilder.Entity<AddressPerson>(ac => { ac.HasBaseType<Address>(); });
+						#endregion
+
+						//Seeding the DataBase
+						#region seed
+						modelBuilder.Entity<Company>().HasData(
+								new Company { Id = 1, Name = "Cine Marx" }
+						);
+
+						modelBuilder.Entity<AddressCompany>().HasData(
+								new AddressCompany { Id = 1, CompanyId = 1, City = "brasilia", District = "Asa Sul", Street = "sql", Number = 42, Complement = null, Country = "Brasil", State = "DF", ZipCode = 7000000, Name = "Brasilia Park"}
+						);
+
+						modelBuilder.Entity<MovieTheater>().HasData(
+								new MovieTheater (qtdCol:10, qtdRow:10){ MovieTheaterNumber = 1, AddressCompanyId = 1}
+						);
+
+						// inicializa as cadeira da sala->todas.
+						for (int i = 0; i < 10; i++)
+						{
+								for (int j = 0; j < 10; j++)
+								{
+										var c = new Chair(i, j);
+										c.AddressCompanyId = 1;
+										c.MovieTheaterNumber = 1;
+										modelBuilder.Entity<Chair>().HasData(c);
+								}
+						}
+						modelBuilder.Entity<Customer>().HasData(
+								new Customer { Id = 1, FirstName = "Dovakin", LastName = "Alcantara", BirthDay = new DateTime(1911, 11, 11), CPF = "000.000.000-00", Email = "email@email", PassC = "muito louco" },
+								new Customer { Id = 2, FirstName = "Machado", LastName = "de assis", BirthDay = new DateTime(1911, 11, 11), CPF = "333.333.333-33", Email = "email@email", PassC = "muito louco 2" }
+						);
+
+						modelBuilder.Entity<Employee>().HasData(
+								new Employee { Id = 3, FirstName = "Dovakin", LastName = "Alcantara", BirthDay = new DateTime(1911, 11, 11), CPF = "000.000.000-00", Cod = 123456, PassE = "12" }
+						);
+
+						modelBuilder.Entity<AddressPerson>().HasData(
+								new AddressPerson { Id = 3, City = "brasilia", District = "Asa Sul", Street = "sql", Number = 42, Complement = null, Country = "Brasil", State = "DF", ZipCode = 7000000, PersonId = 1 },
+								new AddressPerson { Id = 2, City = "brasilia", District = "Asa norte", Street = "Campus Darcy Ribeiro", Number = 0, Complement = "ICC Norte", Country = "Brasil", State = "DF", ZipCode = 70000000, PersonId = 2 }
+						);
+
+						modelBuilder.Entity<Phone>().HasData(
+								new Phone { Id = 1, CountryCode = 55, AreaCode = 61, Number = 55551234, PersonId = 1 },
+								new Phone { Id = 2, CountryCode = 55, AreaCode = 61, Number = 999954321, AddressCompanyId = 1 },
+								new Phone { Id = 3, CountryCode = 55, AreaCode = 61, Number = 999912345, PersonId = 2 }
+						);
+
+						modelBuilder.Entity<Rating>().HasData(
+								new Rating { Id = 1, Name = "Livre", Age = 0 },
+								new Rating { Id = 2, Name = "NR 10", Age = 10 },
+								new Rating { Id = 3, Name = "NR 12", Age = 12 },
+								new Rating { Id = 4, Name = "NR 14", Age = 14 },
+								new Rating { Id = 5, Name = "NR 16", Age = 16 },
+								new Rating { Id = 6, Name = "NR 18", Age = 18 }
+						);
+
+						modelBuilder.Entity<Artist>().HasData(
+								new Artist { Id = 1, Name = "Silvester Stallone", Country = "USA", BirthDay = new DateTime(1946, 6, 6) },
+								new Artist { Id = 2, Name = "Arnold Schwarzenegger", Country = "Autria", BirthDay = new DateTime(1947, 6, 30) }
+						);
+						modelBuilder.Entity<Movie>().HasData(
+								new Movie { Id = 1, Title = "Rambo 3", Duration = 180, ReleaseDate = new DateTime(2000, 12, 25), RatingId = 6 },
+								new Movie { Id = 2, Title = "Rambo 2", Duration = 200, ReleaseDate = new DateTime(1990, 12, 25), RatingId = 6 },
+								new Movie { Id = 3, Title = "Rambo  ", Duration = 160, ReleaseDate = new DateTime(1985, 12, 25) }
+						);
+
+						modelBuilder.Entity<ArtistMovie>().HasData(
+								new ArtistMovie { MovieId = 1, ArtistId = 1 },
+								new ArtistMovie { MovieId = 2, ArtistId = 1 },
+								new ArtistMovie { MovieId = 3, ArtistId = 1 },
+								new ArtistMovie { MovieId = 1, ArtistId = 2 }
+								);
+
+						modelBuilder.Entity<Genre>().HasData(
+								new Genre { Id = 1, Name = "Action" },
+								new Genre { Id = 2, Name = "comedy" }
+						);
+						modelBuilder.Entity<GenreMovie>().HasData(
+								new GenreMovie { MovieId = 1, GenreId = 1 },
+								new GenreMovie { MovieId = 2, GenreId = 1 },
+								new GenreMovie { MovieId = 3, GenreId = 1 }
+								);
+						modelBuilder.Entity<Session>().HasData(
+								new Session { AddressCompanyId = 1, SessionTime = DateTime.Today.AddDays(3), MovieId = 3, MovieTheaterNumber = 1 , Id = 1}
+								);
+
+						modelBuilder.Entity<Ticket>().HasData(
+								new Ticket { SessionId = 1, ChairCol = 4, ChairRow = 5, Value = 10 }
+								);
+						#endregion
+				}
+				protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+				{
+						if (!optionsBuilder.IsConfigured)
+						{
+								optionsBuilder.UseMySQL("Server=localhost;DataBase=unbcineflix;Uid=root;Pwd=@VTQpZGC8*qkj\$uu");
+						}
+				}
+		}
+}
+\end{lstlisting}
+
+A seguir mostramos alguns exemplos de códigoo de acesso ao bando de dados leitura e escrita usando o Entity FrameWork e explicamos como ele funciona.
+
+\begin{lstlisting}
+var session = await _context.Session
+		.Include(s => s.Tickets)
+		.Include(s => s.Movie)
+		.Include(s => s.MovieTheater)
+				.ThenInclude(mt => mt.Chairs)
+		.Include(s => s.MovieTheater)
+				.ThenInclude(mt => mt.AddressCompany)
+				.ThenInclude(ac => ac.Company)
+		.FirstOrDefaultAsync(m => m.Id == id);
+\end{lstlisting}
+
+Acima mostramos o processo de leitura de uma Session no Banco de Dados, no quel é realizado um Join com os objetos/tabelas Tickets, Movie, MovieTheater, Chairs, AddresCompany, Company, pois nesse caso em especial queriamos mostrar que uma determinada sessão $i$ seria exibida em um determinado dia, em um determinado local, por uma determinada empressa, além de precisarmos saber quais cadeiras existem dentro da sala na qual a sessão será exibida e quais ingressos já foram vendidos.
+
+\begin{lstlisting}
+var ticket = await _context.Tickets
+		.FirstOrDefaultAsync(t=> 
+			(t.SessionId == sessionId && 
+				t.ChairRow == chairRow && 
+				t.ChairCol == chairCol));
+\end{lstlisting}
+
+Neste caso é uma busca bem mais simples, simplesmente queremos saber se o Ticket de uma dada Session, com uma determinada cadeira coluna (ChairCol) e Fileira (ChairRow) existe, ou seja, foi vendido.
+
+\begin{lstlisting}
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create([Bind("Id,Name,BirthDay,Country")] Artist artist)
+{
+		if (ModelState.IsValid)
+		{
+				_context.Add(artist);
+				await _context.SaveChangesAsync();
+				return RedirectToAction(nameof(Index));
+		}
+		return View(artist);
+}
+\end{lstlisting}
+Acima mostramos o método completo da camada de persistência, controlador, que é usado para adicionar um novo objeto artista dentro do banco de dados relacional, pela simplicidade proporcionada pelo framework utilizado acreditamos ser desnecessário separar a camada de persistência do controlador, apesar que seria especialmente útil se desejarmos 
 
 \section{Álgebra relacional}
 
