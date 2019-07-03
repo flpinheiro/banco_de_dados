@@ -169,7 +169,7 @@ Nesta seção mostramos as consulta acima realizadas, mas em álgebra relacional
 
 \begin{eqnarray*}
 \sigma_{\textrm{addresses.Id = movietheaters.AddressCompanyId and addresses.CompanyId = companies.Id}}\\
-_{\textrm{ and addresses.Discriminator = AddressCompany}}\\
+_{\textrm{ and addresses.Discriminator = `AddressCompany'}}\\
 (\textrm{movietheaters} \times \textrm{addresses} \times \textrm{companies})
 \end{eqnarray*}
 
@@ -180,7 +180,8 @@ _{ \textrm{and movietheaters.MovieTheaterNumber = session.MovieTheaterNumber}}\\
 \end{eqnarray*}
 
 \begin{eqnarray}
-\sigma_{people.id = addresses.PersonId and people.id = phones.PersonId and addresses.Discriminator = 'AddressPerson'}(people, addresses,phones)
+\sigma_{ \textrm{people.id = addresses.PersonId and people.id = phones.PersonId and addresses.Discriminator = 'AddressPerson'}}\\
+(people, addresses,phones)
 \end{eqnarray}
 
 \section{Views}
