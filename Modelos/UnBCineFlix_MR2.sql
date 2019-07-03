@@ -284,7 +284,14 @@ CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Tickets` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
+DELIMITER //
+CREATE PROCEDURE session_value ()
+BEGIN 
+	SELECT Session.SessionTime, sum(Tickets.Value) "Session Tax" FROM Session, Tickets
+    WHERE Session.Id = Tickets.SessionId
+    GROUP BY Session.Id;
+END
+//
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
