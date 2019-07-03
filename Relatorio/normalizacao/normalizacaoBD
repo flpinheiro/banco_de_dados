@@ -1,0 +1,85 @@
+NORMALIZAÇÃO
+
+TB_COMPANIES
+
+						1° passo
+ 
+							Todos os atributos da tabela devem ser atômicos, não multivalorados.
+							Observa-se no momento que a tabela Companies não apresenta multivalores.
+
+					
+ %----Foto da Tabela Companies------%		2° e 3° passo
+			
+							Todos os atributos da tabela devem estar associados a uma <PK> como inteira, e não apenas a 								uma parte da mesma.
+							Observa-se que todos os atributos fazem referência a <PK> da tabela Companies.
+
+
+							
+TB_ARTISTS
+
+
+						1° passo
+
+ %----Foto da Tabela Artists--------%			Nenhum atributo da tabela Artists tem a sintaxe para ser um atributo multivalorado.
+
+						2° e 3° passo 
+
+							Todos os atributos da tabela estão associados a <PK> ID, sem dependências transtivas.
+
+
+
+
+TB_RATINGS
+
+						1° passo
+	
+							Por ser uma tabela relativamente simples, nenhum de seus atributos necessitam de 								multivalores.
+ %----Foto da Tabela Artists--------%
+						2°e 3° passo
+	
+							Os atriutos Age e Name dependem diretamente da <PK> ID, não existindo dependências 								transitivas
+
+
+TB_PHONES
+
+						1° passo
+	
+							Nenhum atributo tem multivalor, pois os possíveis candidados se tornaram outras tabelas e 								foram incluídos através de <FKs>.
+ %----Foto da Tabela Artists--------%
+						2° passo
+
+							Todos os atributos da tabela dependem da <PK> ID, os atributos que não dependiam foram 								transformados em tabelas e incluídos através de <FKs>.
+									
+						3° passo
+			
+							Na terceira forma normal todos os atributos devem depender de alguma <PK>, observa-se que 								na tabela todos são dependentes.
+							
+
+TB_SESSION
+
+						1° passo
+
+							Nesta tabela, nenhum atributo possui multivalor pois os possíveis candidatos foram 								transformados ou herdados de outras tabelas.
+ %----Foto da Tabela Session--------%	
+						2° passo
+
+							Todos os atributos da tabela no momento dependem da <PK> ID.
+
+						3° passo
+
+							Na tabela, todos os atributos dependem da <PK> ID ou são <FKs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
