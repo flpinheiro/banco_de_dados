@@ -22,6 +22,15 @@
     \lstset{upquote=true}
 
     \lstdefinestyle{mystyle}{
+				language=SQL,
+				deletekeywords={IDENTITY},
+				deletekeywords={[2]INT},
+				morekeywords={clustered},
+				framesep=8pt,
+				%xleftmargin=40pt,
+				%framexleftmargin=40pt,
+				frame=tb,
+				framerule=0pt,
         backgroundcolor=\color{backcolour},   
         commentstyle=\color{codegreen},
         keywordstyle=\color{codepurple},
@@ -50,6 +59,7 @@ Pedro Oliveira - 17/0163768}
 \begin{document}
 
 \maketitle
+%\makeindex
 
 \begin{abstract}
 Neste relatório desenvolvemos os requisitos básicos de um sistema de banco de dados para um modelo de vendas de ingresso de um cinema. 
@@ -91,6 +101,24 @@ Na figura \ref{fig:mr} mostramos o modelo relacional utilizado para implementaç
 \label{fig:mr}%
 \end{figure}
 
+\section{Consultas}
+
+Nesta seção mostramos exemplo de consultas que podem ser realizadas nesse modelo relacional de banco de dados.
+
+\begin{lstlisting}
+		use unbcineflix;
+		
+		select * FROM movies, ratings, genremovies, genres where ratingid = ratings.id and movies.id = genremovies.movieid and genremovies.genreid = genres.id;
+		
+		select * from movies, artistmovies, artists where Movies.id = artistmovies.MovieId and artistmovies.ArtistId = artists.Id;
+		
+		select * from movietheaters, addresses,companies where addresses.Id = movietheaters.AddressCompanyId and addresses.CompanyId = companies.Id and addresses.Discriminator = 'AddressCompany';
+		
+		select * from session, movietheaters, tickets where session.Id = tickets.SessionId and session.AddressCompanyId = movietheaters.AddressCompanyId and movietheaters.MovieTheaterNumber = session.MovieTheaterNumber;
+		
+		select * from people, addresses,phones where people.id = addresses.PersonId and people.id = phones.PersonId and addresses.Discriminator = 'AddressPerson';
+\end{lstlisting}
+
 \section{Script Sql}
 
 Nesta seção mostramos o script sql para geração do banco de dados, que foi gerado utilizando o modelo acima e foi gerado automaticamente pelo MySQL.
@@ -106,20 +134,20 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 		SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 		-- -----------------------------------------------------
-		-- Schema UnBCineFlix2
+		-- Schema UnBCineFlix
 		-- -----------------------------------------------------
-		DROP SCHEMA IF EXISTS `UnBCineFlix2` ;
+		DROP SCHEMA IF EXISTS `UnBCineFlix` ;
 
 		-- -----------------------------------------------------
-		-- Schema UnBCineFlix2
+		-- Schema UnBCineFlix
 		-- -----------------------------------------------------
-		CREATE SCHEMA IF NOT EXISTS `UnBCineFlix2` DEFAULT CHARACTER SET utf8 ;
-		USE `UnBCineFlix2` ;
+		CREATE SCHEMA IF NOT EXISTS `UnBCineFlix` DEFAULT CHARACTER SET utf8 ;
+		USE `UnBCineFlix` ;
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Addresses`
+		-- Table `UnBCineFlix`.`Addresses`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Addresses` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Addresses` (
 			`Id` INT NOT NULL AUTO_INCREMENT,
 			`Country` VARCHAR(100) NULL,
 			`State` VARCHAR(100) NULL,
@@ -138,21 +166,21 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Addresses_Companies1_idx` (`CompanyId` ASC) VISIBLE,
 			CONSTRAINT `fk_Addresses_People1`
 				FOREIGN KEY (`PersonId`)
-				REFERENCES `UnBCineFlix2`.`People` (`Id`)
+				REFERENCES `UnBCineFlix`.`People` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION,
 			CONSTRAINT `fk_Addresses_Companies1`
 				FOREIGN KEY (`CompanyId`)
-				REFERENCES `UnBCineFlix2`.`Companies` (`Id`)
+				REFERENCES `UnBCineFlix`.`Companies` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`ArtistMovie`
+		-- Table `UnBCineFlix`.`ArtistMovie`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`ArtistMovie` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`ArtistMovie` (
 			`MovieId` INT NOT NULL,
 			`ArtistId` INT NOT NULL,
 			PRIMARY KEY (`MovieId`, `ArtistId`),
@@ -160,21 +188,21 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Movie_has_Artist_Movie1_idx` (`MovieId` ASC) VISIBLE,
 			CONSTRAINT `fk_Movie_has_Artist_Movie1`
 				FOREIGN KEY (`MovieId`)
-				REFERENCES `UnBCineFlix2`.`Movies` (`Id`)
+				REFERENCES `UnBCineFlix`.`Movies` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION,
 			CONSTRAINT `fk_Movie_has_Artist_Artist1`
 				FOREIGN KEY (`ArtistId`)
-				REFERENCES `UnBCineFlix2`.`Artists` (`Id`)
+				REFERENCES `UnBCineFlix`.`Artists` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Artists`
+		-- Table `UnBCineFlix`.`Artists`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Artists` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Artists` (
 			`Id` INT NOT NULL,
 			`Name` VARCHAR(100) NOT NULL,
 			`Birthday` DATETIME NULL,
@@ -184,9 +212,9 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Chairs`
+		-- Table `UnBCineFlix`.`Chairs`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Chairs` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Chairs` (
 			`Col` INT NOT NULL,
 			`Row` VARCHAR(45) NOT NULL,
 			`AddressCompanyId` INT NOT NULL,
@@ -195,16 +223,16 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Chairs_MovieTheaters1_idx` (`AddressCompanyId` ASC, `Number` ASC) VISIBLE,
 			CONSTRAINT `fk_Chairs_MovieTheaters1`
 				FOREIGN KEY (`Number`)
-				REFERENCES `UnBCineFlix2`.`MovieTheaters` (`Number`)
+				REFERENCES `UnBCineFlix`.`MovieTheaters` (`Number`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Companies`
+		-- Table `UnBCineFlix`.`Companies`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Companies` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Companies` (
 			`Id` INT NOT NULL AUTO_INCREMENT,
 			`Name` VARCHAR(100) NOT NULL,
 			`Cnpj` VARCHAR(20) NULL,
@@ -214,9 +242,9 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`GenreMovie`
+		-- Table `UnBCineFlix`.`GenreMovie`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`GenreMovie` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`GenreMovie` (
 			`MovieId` INT NOT NULL,
 			`GenreId` INT ZEROFILL NOT NULL,
 			PRIMARY KEY (`MovieId`, `GenreId`),
@@ -224,21 +252,21 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Movie_has_Genre_Movie1_idx` (`MovieId` ASC) VISIBLE,
 			CONSTRAINT `fk_Movie_has_Genre_Movie1`
 				FOREIGN KEY (`MovieId`)
-				REFERENCES `UnBCineFlix2`.`Movies` (`Id`)
+				REFERENCES `UnBCineFlix`.`Movies` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION,
 			CONSTRAINT `fk_Movie_has_Genre_Genre1`
 				FOREIGN KEY (`GenreId`)
-				REFERENCES `UnBCineFlix2`.`Genres` (`Id`)
+				REFERENCES `UnBCineFlix`.`Genres` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Genres`
+		-- Table `UnBCineFlix`.`Genres`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Genres` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Genres` (
 			`Id` INT ZEROFILL NOT NULL,
 			`Name` VARCHAR(100) NOT NULL,
 			PRIMARY KEY (`Id`))
@@ -246,9 +274,9 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`MovieTheaters`
+		-- Table `UnBCineFlix`.`MovieTheaters`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`MovieTheaters` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`MovieTheaters` (
 			`QtdCol` INT NOT NULL,
 			`QtdRow` INT NOT NULL,
 			`Number` INT NOT NULL,
@@ -257,16 +285,16 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_MovieTheaters_Addresses1_idx` (`AddressesCompanyId` ASC) VISIBLE,
 			CONSTRAINT `fk_MovieTheaters_Addresses1`
 				FOREIGN KEY (`AddressesCompanyId`)
-				REFERENCES `UnBCineFlix2`.`Addresses` (`Id`)
+				REFERENCES `UnBCineFlix`.`Addresses` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Movies`
+		-- Table `UnBCineFlix`.`Movies`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Movies` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Movies` (
 			`Id` INT NOT NULL AUTO_INCREMENT,
 			`Title` VARCHAR(100) NOT NULL,
 			`ReleaseDate` DATETIME NULL,
@@ -279,16 +307,16 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Movie_Rating1_idx` (`RatingId` ASC) VISIBLE,
 			CONSTRAINT `fk_Movie_Rating1`
 				FOREIGN KEY (`RatingId`)
-				REFERENCES `UnBCineFlix2`.`Ratings` (`Id`)
+				REFERENCES `UnBCineFlix`.`Ratings` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`People`
+		-- Table `UnBCineFlix`.`People`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`People` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`People` (
 			`Id` INT NOT NULL AUTO_INCREMENT,
 			`FirstName` VARCHAR(100) NOT NULL,
 			`LastName` VARCHAR(100) NOT NULL,
@@ -304,9 +332,9 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Phones`
+		-- Table `UnBCineFlix`.`Phones`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Phones` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Phones` (
 			`Id` INT NOT NULL AUTO_INCREMENT,
 			`CountryCode` INT NULL,
 			`AreaCode` INT NULL,
@@ -318,21 +346,21 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Phones_People1_idx` (`PersonId` ASC) VISIBLE,
 			CONSTRAINT `fk_Phones_Addresses1`
 				FOREIGN KEY (`AddresseCompanyId`)
-				REFERENCES `UnBCineFlix2`.`Addresses` (`Id`)
+				REFERENCES `UnBCineFlix`.`Addresses` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION,
 			CONSTRAINT `fk_Phones_People1`
 				FOREIGN KEY (`PersonId`)
-				REFERENCES `UnBCineFlix2`.`People` (`Id`)
+				REFERENCES `UnBCineFlix`.`People` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Ratings`
+		-- Table `UnBCineFlix`.`Ratings`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Ratings` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Ratings` (
 			`Id` INT NOT NULL AUTO_INCREMENT,
 			`Name` VARCHAR(100) NOT NULL,
 			`Age` INT NOT NULL,
@@ -341,9 +369,9 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Session`
+		-- Table `UnBCineFlix`.`Session`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Session` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Session` (
 			`Id` INT NOT NULL AUTO_INCREMENT,
 			`SessionTime` DATETIME NOT NULL,
 			`AddressCompanyId` INT NULL,
@@ -354,21 +382,21 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Session_Movies1_idx` (`MoviesId` ASC) VISIBLE,
 			CONSTRAINT `fk_Session_MovieTheaters1`
 				FOREIGN KEY (`MovieTheatersNumber`)
-				REFERENCES `UnBCineFlix2`.`MovieTheaters` (`Number`)
+				REFERENCES `UnBCineFlix`.`MovieTheaters` (`Number`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION,
 			CONSTRAINT `fk_Session_Movies1`
 				FOREIGN KEY (`MoviesId`)
-				REFERENCES `UnBCineFlix2`.`Movies` (`Id`)
+				REFERENCES `UnBCineFlix`.`Movies` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
 
 		-- -----------------------------------------------------
-		-- Table `UnBCineFlix2`.`Tickets`
+		-- Table `UnBCineFlix`.`Tickets`
 		-- -----------------------------------------------------
-		CREATE TABLE IF NOT EXISTS `UnBCineFlix2`.`Tickets` (
+		CREATE TABLE IF NOT EXISTS `UnBCineFlix`.`Tickets` (
 			`SessionId` INT NOT NULL,
 			`ChairCol` INT NOT NULL,
 			`ChairRow` INT NOT NULL,
@@ -377,7 +405,7 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			INDEX `fk_Tickets_Session1_idx` (`SessionId` ASC) VISIBLE,
 			CONSTRAINT `fk_Tickets_Session1`
 				FOREIGN KEY (`SessionId`)
-				REFERENCES `UnBCineFlix2`.`Session` (`Id`)
+				REFERENCES `UnBCineFlix`.`Session` (`Id`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
