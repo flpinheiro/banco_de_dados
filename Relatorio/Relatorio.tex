@@ -28,6 +28,7 @@
 				morekeywords={clustered},
 				framesep=8pt,
 				xleftmargin=40pt,
+				tabsize=1,
 				%framexleftmargin=40pt,
 				frame=tb,
 				framerule=0pt,
@@ -151,31 +152,61 @@ Nesta seção mostramos exemplo de consultas que podem ser realizadas nesse mode
 		select * from people, addresses,phones where people.id = addresses.PersonId and people.id = phones.PersonId and addresses.Discriminator = 'AddressPerson';
 \end{lstlisting}
 
+\section{Álgebra Relacional}
+
+Nesta seção mostramos as consulta acima realizadas, mas em álgebra relacional.
+
+\begin{eqnarray*}
+\sigma_{\textrm{Movies.RatingId = Ratings.Id and Movies.Id = GenreMovies.MovieId and genremovies.genreid = genres.id }}\\
+(\textrm{Movies} \times \textrm{Ratings} \times \textrm{GenreMovies} \times \textrm{Genre})
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\sigma_{\textrm{Movies.id = artistmovies.MovieId and artistmovies.ArtistId = artists.Id}}\\
+( \textrm{ movies} \times  \textrm{artistmovies} \times{ artists} )
+\end{eqnarray*}
+
+
+\begin{eqnarray*}
+\sigma_{\textrm{addresses.Id = movietheaters.AddressCompanyId and addresses.CompanyId = companies.Id}}\\
+_{\textrm{ and addresses.Discriminator = AddressCompany}}\\
+(\textrm{movietheaters} \times \textrm{addresses} \times \textrm{companies})
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\sigma_{\textrm{session.Id = tickets.SessionId and session.AddressCompanyId = movietheaters.AddressCompanyId}}\\
+_{ \textrm{and movietheaters.MovieTheaterNumber = session.MovieTheaterNumber}}\\
+(\textrm{session} \times \textrm{ movietheaters} \times \textrm{ tickets})\\
+\end{eqnarray*}
+
+\begin{eqnarray}
+\sigma_{people.id = addresses.PersonId and people.id = phones.PersonId and addresses.Discriminator = 'AddressPerson'}(people, addresses,phones)
+\end{eqnarray}
 
 \section{Views}
 
 Nesta parte mostramos exemplos da utilização de Views no código do SQL.
 
 \begin{lstlisting}
-	use unbcineflix;
+		use unbcineflix;
 
-	drop view addresscompany;
+		drop view addresscompany;
 
-	drop view AddressPerson;
+		drop view AddressPerson;
 
-	drop view SoldTickets;
+		drop view SoldTickets;
 
-	create view AddressCompany as SELECT Country,state, city, Street, number, zipcode, name from addresses WHERE addresses.Discriminator = 'AddressCompany';
+		create view AddressCompany as SELECT Country,state, city, Street, number, zipcode, name from addresses WHERE addresses.Discriminator = 'AddressCompany';
 
-	create view AddressPerson as SELECT Country,state, city, Street, number, zipcode from addresses WHERE addresses.Discriminator = 'AddressPerson';
+		create view AddressPerson as SELECT Country,state, city, Street, number, zipcode from addresses WHERE addresses.Discriminator = 'AddressPerson';
 
-	create view SoldTickets as select session.id as 'numero sessao', movies.Title as 'Titulo do filme', session.MovieTheaterNumber as 'sala', session.SessionTime as 'dia e hora', ChairCol as 'numero coluna', ChairRow  as 'numero fileira', Value as 'valor' from session, movietheaters, tickets, movies where session.Id = tickets.SessionId and session.AddressCompanyId = movietheaters.AddressCompanyId and movietheaters.MovieTheaterNumber = session.MovieTheaterNumber and session.MovieId = movies.id;
+		create view SoldTickets as select session.id as 'numero sessao', movies.Title as 'Titulo do filme', session.MovieTheaterNumber as 'sala', session.SessionTime as 'dia e hora', ChairCol as 'numero coluna', ChairRow  as 'numero fileira', Value as 'valor' from session, movietheaters, tickets, movies where session.Id = tickets.SessionId and session.AddressCompanyId = movietheaters.AddressCompanyId and movietheaters.MovieTheaterNumber = session.MovieTheaterNumber and session.MovieId = movies.id;
 
-	select * from addresscompany;
+		select * from addresscompany;
 
-	select * from AddressPerson;
+		select * from AddressPerson;
 
-	select * from SoldTickets;
+		select * from SoldTickets;
 \end{lstlisting}
 
 Na figura \ref{fig:view_soldticket} podemos ver um exemplo de resultado mostrado pela viu SoldTickets.
@@ -732,9 +763,7 @@ public async Task<IActionResult> Create([Bind("Id,Name,BirthDay,Country")] Artis
 \end{lstlisting}
 Acima mostramos o método completo da camada de persistência, controlador, que é usado para adicionar um novo objeto artista dentro do banco de dados relacional, pela simplicidade proporcionada pelo framework utilizado acreditamos ser desnecessário separar a camada de persistência do controlador, apesar que seria especialmente útil se desejarmos 
 
-\section{Álgebra relacional}
-
-\section{Avaliação das formas normais}
+\section{Avaliação das Formas Normais}
 
 %\pagebreak
 %\bibliographystyle{plain}
