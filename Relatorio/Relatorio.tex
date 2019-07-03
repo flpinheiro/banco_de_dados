@@ -118,7 +118,7 @@ comprar ingressos para sessões ainda não encerradas.
 
 Na figura \ref{fig:mer} mostramos a primeira versão conceitual do sistema do
 
-\begin{figure}[h]
+\begin{figure}
 \includegraphics[width=\columnwidth]{UnBCineFlix_MER}%
 \caption{Modelo Entidade Relacionamento}%
 \label{fig:mer}%
@@ -128,7 +128,7 @@ Na figura \ref{fig:mer} mostramos a primeira versão conceitual do sistema do
 
 Na figura \ref{fig:mr} mostramos o modelo relacional utilizado para implementação  do programa
 
-\begin{figure}[h]
+\begin{figure}
 \includegraphics[width=\columnwidth]{UnBCineFlix_MR}%
 \caption{Modelo Relacional}%
 \label{fig:mr}%
@@ -179,10 +179,11 @@ _{ \textrm{and movietheaters.MovieTheaterNumber = session.MovieTheaterNumber}}\\
 (\textrm{session} \times \textrm{ movietheaters} \times \textrm{ tickets})\\
 \end{eqnarray*}
 
-\begin{eqnarray}
-\sigma_{ \textrm{people.id = addresses.PersonId and people.id = phones.PersonId and addresses.Discriminator = 'AddressPerson'}}\\
-(people, addresses,phones)
-\end{eqnarray}
+\begin{eqnarray*}
+\sigma_{ \textrm{people.id = addresses.PersonId and people.id = phones.PersonId and}}\\
+_{\textrm{ addresses.Discriminator = `AddressPerson'}}\\
+(\textrm{people} \times \textrm{ addresses } \times \textrm {phones})
+\end{eqnarray*}
 
 \section{Views}
 
@@ -513,6 +514,15 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 		SET SQL_MODE=@OLD_SQL_MODE;
 		SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 		SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+\end{lstlisting}
+
+\section{Procedure}
+
+Nesta parte mostramo um exemplo simples de uma procedure que pode ser executada neste banco de dados.
+
+%colocar o codigo da procedure depois desse begin. 
+\begin{lstlisting}
+
 \end{lstlisting}
 
 
