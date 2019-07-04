@@ -276,7 +276,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
-
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`ArtistMovie`
 		-- -----------------------------------------------------
@@ -298,7 +297,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
-
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Artists`
 		-- -----------------------------------------------------
@@ -309,7 +307,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			`Country` VARCHAR(45) NULL,
 			PRIMARY KEY (`Id`))
 		ENGINE = InnoDB;
-
 
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Chairs`
@@ -328,7 +325,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
-
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Companies`
 		-- -----------------------------------------------------
@@ -339,7 +335,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			`Url` VARCHAR(255) NULL,
 			PRIMARY KEY (`Id`))
 		ENGINE = InnoDB;
-
 
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`GenreMovie`
@@ -362,7 +357,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
-
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Genres`
 		-- -----------------------------------------------------
@@ -371,7 +365,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			`Name` VARCHAR(100) NOT NULL,
 			PRIMARY KEY (`Id`))
 		ENGINE = InnoDB;
-
 
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`MovieTheaters`
@@ -389,7 +382,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
-
 
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Movies`
@@ -412,7 +404,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
-
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`People`
 		-- -----------------------------------------------------
@@ -429,7 +420,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			`PassE` VARCHAR(100) NULL,
 			PRIMARY KEY (`Id`))
 		ENGINE = InnoDB;
-
 
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Phones`
@@ -456,7 +446,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
-
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Ratings`
 		-- -----------------------------------------------------
@@ -466,7 +455,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 			`Age` INT NOT NULL,
 			PRIMARY KEY (`Id`))
 		ENGINE = InnoDB;
-
 
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Session`
@@ -492,7 +480,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
 
-
 		-- -----------------------------------------------------
 		-- Table `UnBCineFlix`.`Tickets`
 		-- -----------------------------------------------------
@@ -509,7 +496,6 @@ Nesta seção mostramos o script sql para geração do banco de dados, que foi g
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION)
 		ENGINE = InnoDB;
-
 
 		SET SQL_MODE=@OLD_SQL_MODE;
 		SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
@@ -775,6 +761,85 @@ public async Task<IActionResult> Create([Bind("Id,Name,BirthDay,Country")] Artis
 Acima mostramos o método completo da camada de persistência, controlador, que é usado para adicionar um novo objeto artista dentro do banco de dados relacional, pela simplicidade proporcionada pelo framework utilizado acreditamos ser desnecessário separar a camada de persistência do controlador, apesar que seria especialmente útil se desejarmos 
 
 \section{Avaliação das Formas Normais}
+
+%TB_COMPANIES
+
+\subsection{Tabela companies}
+
+\begin{enumerate}
+	\item Todos os atributos da tabela devem ser atômicos, não multivalorados.\\Observa-se no momento que a tabela Companies não apresenta multivalores.
+	\item Todos os atributos da tabela devem estar associados a uma <PK> como inteira, e não apenas a uma parte da mesma.
+	\item Observa-se que todos os atributos fazem referência a <PK> da tabela Companies.
+\end{enumerate}
+
+\begin{figure}%
+\includegraphics[width=.4\columnwidth]{normalizacao/companies}%
+\caption{Tabela Companies}%
+%\label{}%
+\end{figure}
+
+							
+%TB_ARTISTS
+
+\subsection{Tabela Artists}
+
+\begin{enumerate}
+	\item Nenhum atributo da tabela Artists tem a sintaxe para ser um atributo multivalorado.
+	\item Todos os atributos da tabela estão associados a <PK> ID, sem dependências transtivas.
+\end{enumerate}
+
+\begin{figure}%
+\includegraphics[width=.4\columnwidth]{normalizacao/artists}%
+\caption{Tabela Artists}%
+%\label{}%
+\end{figure}
+
+%TB_RATINGS
+
+\subsection{Tabela Ratings}
+
+\begin{enumerate}
+	\item Por ser uma tabela relativamente simples, nenhum de seus atributos necessitam de multivalores.
+	\item Os atriutos Age e Name dependem diretamente da <PK> ID, não existindo dependências transitivas
+\end{enumerate}	
+
+\begin{figure}%
+\includegraphics[width=.4\columnwidth]{normalizacao/ratings}%
+\caption{Tabela Ratings}%
+%\label{}%
+\end{figure}
+
+%TB_PHONES
+\subsection{Tabela Phones}
+
+\begin{enumerate}
+	\item Nenhum atributo tem multivalor, pois os possíveis candidados se tornaram outras tabelas e foram incluídos através de <FKs>.
+	\item Todos os atributos da tabela dependem da <PK> ID, os atributos que não dependiam foram transformados em tabelas e incluídos através de <FKs>.
+	\item Na terceira forma normal todos os atributos devem depender de alguma <PK>, observa-se que na tabela todos são dependentes.
+\end{enumerate}			
+
+\begin{figure}%
+\includegraphics[width=.4\columnwidth]{normalizacao/phones}%
+\caption{Tabela Phones}%
+%\label{}%
+\end{figure}
+
+%TB_SESSION
+
+\subsection{Tabela Session}
+
+\begin{enumerate}
+	\item Nesta tabela, nenhum atributo possui multivalor pois os possíveis candidatos foram transformados ou herdados de outras tabelas.
+	\item Todos os atributos da tabela no momento dependem da <PK> ID.
+	\item Na tabela, todos os atributos dependem da <PK> ID ou são <FKs>
+\end{enumerate}
+			
+\begin{figure}%
+\includegraphics[width=.4\columnwidth]{normalizacao/session}%
+\caption{Tabela Session}%
+%\label{}%
+\end{figure}
+
 
 %\pagebreak
 %\bibliographystyle{plain}
